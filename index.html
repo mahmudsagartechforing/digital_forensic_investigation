@@ -1,3 +1,12 @@
+<!-- 
+    This a static page for Digital Forensic Investigation landing page
+    For style Sass preprocessors are used
+    Breakpoints sre written in "_media_query_mixin"
+    _vairiable.scss for common color and style
+    _global.scss for global style like body, p, h1-h6, button, a and others
+    All main section style can be found in index.scss file
+ -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -12,12 +21,18 @@
         />
         <!-- title -->
         <title>Digital Forensic Investigation</title>
-        <!-- Icon -->
+
+        <link rel="stylesheet" href="./country_code_necesities/intlTelInput.js" />
+        <link rel="stylesheet" href="./country_code_necesities/country.min.css" />
         <!-- custom css -->
         <link rel="stylesheet" href="./css/indexStyle.css" />
     </head>
 
     <body>
+        <!-- 
+            Navigation section starts
+            static navigation styles are added in "_navbar.scss"
+         -->
         <header>
             <div class="container">
                 <nav class="flex flex-jc-sb flex-ai-c">
@@ -32,8 +47,10 @@
                 </nav>
             </div>
         </header>
+        <!-- navigation ends -->
         <main>
             <section class="jumbotron" id="jumbotron">
+                <!-- overlay color added on top of background -->
                 <div class="overlay"></div>
                 <div class="container">
                     <div class="jumbotron--content">
@@ -55,6 +72,7 @@
                         </article>
                         <div class="jumbotron--form">
                             <h2>TALK TO OUR FORENSIC EXPERT</h2>
+                            <!-- Bitrix form generated for contact -->
                             <script
                                 data-b24-form="inline/26/3c0q6b"
                                 data-skip-moving="true"
@@ -315,7 +333,11 @@
                     </picture>
                 </div>
             </section>
-
+            <!-- client section ends -->
+            <!-- 
+                testimonial section starts 
+                styles can be found in "indexStyle.scss" under testimonial class
+             -->
             <section class="testimonial">
                 <h2>CLIENT SUCCESS STORIES</h2>
                 <p class="subHeader">What our customers are saying</p>
@@ -401,7 +423,11 @@
                     </div>
                 </div>
             </section>
-
+            <!-- testimonial ends -->
+            <!-- 
+                bottom Banner
+                Style are in "indexStyle.scss" under banner class
+             -->
             <section class="banner">
                 <h2>
                     INVESTIGATE THE FUNDAMENTAL CAUSES OF A SECURITY INCIDENT
@@ -418,8 +444,16 @@
                     get started with techforing
                 </a>
             </section>
+            <!-- 
+                bottom Banner
+                Style are in "indexStyle.scss" under banner class
+             -->
         </main>
-
+        <!-- main section ends -->
+        <!-- 
+            footer starts
+            styles are found in "_footer.scss"
+        -->
         <footer>
             <div class="container">
                 <div class="footer-content">
@@ -431,14 +465,113 @@
                 </div>
             </div>
         </footer>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-        <script src="https://kit.fontawesome.com/3a7fa53eb8.js" crossorigin="anonymous"></script>
+        <!-- Footer ends -->
+        <!--  -->
+        <!--  -->
+        <!--  -->
+        <!-- Script and content blocking elements are here -->
+
+        <!-- Google font for Roboto fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap"
+            rel="stylesheet"
+        />
+        <!-- Google font for Roboto fonts -->
+        <!-- Font Awsome icon CDN -->
+        <script
+            src="https://kit.fontawesome.com/3a7fa53eb8.js"
+            crossorigin="anonymous"
+        ></script>
+        <!-- Font Awsome icon CDN -->
+        <!-- 
+            scripts for country code integration in Bytrix Form
+            files are stored in "country_code_necesities" folder
+         -->
+        <script src="./intlTelInput.js"></script>
+        <script>
+            if (localStorage.hasOwnProperty("b24-form-field-stored-values"))
+                localStorage.removeItem("b24-form-field-stored-values");
+
+            let timer = 0;
+            let country = "us";
+            let countryData;
+
+            fetch("https://reallyfreegeoip.org/json/")
+                .then((res) => res.json())
+                .then((data) => {
+                    country = data.country_code.toLowerCase();
+                    ipLocation();
+                });
+
+            function ipLocation() {
+                function addCode() {
+                    console.log(document.querySelector(".b24-form-control"));
+                    let input = document.querySelectorAll("input[type='tel']");
+
+                    input.forEach((elem) => {
+                        let currInput = intlTelInput(elem, {
+                            initialCountry: country,
+                        });
+
+                        countryData = currInput.getSelectedCountryData();
+                        elem.value = "+" + countryData.dialCode;
+
+                        let dialCode = "+" + countryData.dialCode;
+                        document.addEventListener("click", (e) => {
+                            let elemClass = e.target.classList;
+                            if (elemClass.contains("iti__country")) {
+                                dialCode = e.target.children[2].innerHTML;
+                                elem.value = dialCode;
+                            } else if (
+                                elemClass.contains("iti__flag-box") ||
+                                elemClass.contains("iti__country-name") ||
+                                elemClass.contains("iti__dial-code")
+                            ) {
+                                dialCode =
+                                    e.target.parentNode.children[2].innerHTML;
+                                elem.value = dialCode;
+                            }
+                        });
+                    });
+                    timer++;
+                    if (timer > 30) clearInterval(interval);
+                }
+
+                let interval = setInterval(addCode, 500);
+
+                document.querySelectorAll(".bitrix-form-btn").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        timer = 0;
+                        interval = setInterval(addCode, 500);
+                    });
+                });
+
+                let classes = [
+                    "b24-form",
+                    "b24-form-control",
+                    "iti__flag",
+                    "iti__arrow",
+                    "iti__selected-flag",
+                ];
+                document.body.addEventListener("click", (e) => {
+                    if (classes.includes(e.target.classList[0]))
+                        clearInterval(interval);
+                });
+            }
+        </script>
+        <!-- 
+            scripts for country code integration ends
+            scripts for adding "?r_done=1" parameter
+        -->
         <script>
             const queryParams = new URLSearchParams(window.location.search);
             queryParams.set("r_done", "1");
-            history.replaceState(null, null, "?"+queryParams.toString());
+            history.replaceState(null, null, "?" + queryParams.toString());
         </script>
+        <!-- 
+            scripts for adding "?r_done=1" parameter ends
+        -->
     </body>
 </html>
